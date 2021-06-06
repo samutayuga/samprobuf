@@ -1,0 +1,20 @@
+syntax = "proto3";
+package calculator;
+option go_package = "calculator/primerpb;primerpb";
+
+// The calculator service defintion
+// a unary API
+// Synchronous API, request-response model
+service PrimerCalculator{
+    rpc Calculate(CalculationRequest) returns (CalculationResponse){}
+}
+
+message CalculationRequest {
+string requestor=1;
+    int32 input=2;
+}
+
+message CalculationResponse {
+string message=1;
+    int32 count=2;
+}
