@@ -1,7 +1,6 @@
 syntax = "proto3";
-package calculator;
-option go_package = "calculator/primerpb;primerpb";
-
+package pb;
+option go_package="calc/pb";
 // The calculator service defintion
 // a unary API
 // Synchronous API, request-response model
@@ -16,5 +15,4 @@ string requestor=1;
 
 message CalculationResponse {
 string message=1;
-    int32 count=2;
 }

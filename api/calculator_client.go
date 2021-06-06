@@ -10,24 +10,31 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/samutayuga/samprobuf/calculator/primerpb"
+	"github.com/samutayuga/samprobuf/pb"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 )
 
 var (
-	clientPort int
+	clientPort  int
+	svrPort     int
+	serviceName string
+)
+
+const (
+	connStr = "%s:%d"
 )
 
 func main() {
 	log.Default().SetFlags(log.LstdFlags | log.Lshortfile)
 	opts := grpc.WithInsecure()
-	conn, err := grpc.Dial("localhost:8001", opts)
+	cs := fmt.Sprintf(connStr, serviceName, svrPort)
+	conn, err := grpc.Dial(cs, opts)
 	if err != nil {
 		log.Fatalf("error while dialing server 8001 %v", err)
 	}
 	defer conn.Close()
-	client := primerpb.NewPrimerCalculatorClient(conn)
+	client := pb.NewPrimerCalculatorClient(conn)
 	routes := mux.NewRouter()
 	routes.HandleFunc("/prime/{name}/{number}", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json;charset=UFT-8")
@@ -48,7 +55,7 @@ func main() {
 				ctx, cancel := context.WithTimeout(context.TODO(), time.Minute)
 				defer cancel()
 
-				cRes, cErr := client.Calculate(ctx, &primerpb.CalculationRequest{Requestor: requestor, Input: int32(number)})
+				cRes, cErr := client.Calculate(ctx, &pb.CalculationRequest{Requestor: requestor, Input: int32(number)})
 				if cErr != nil {
 					log.Fatalf("Error while calling the calculate method %v", cErr)
 				}
@@ -82,6 +89,9 @@ func init() {
 	}
 
 	clientPort = v.GetInt("client.port")
+	serviceName = v.GetString("server.service-name")
+	svrPort = v.GetInt("server.port")
+
 	log.Printf("get port number from config %d", clientPort)
 
 }

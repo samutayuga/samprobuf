@@ -1,2 +1,5 @@
+server:
+  port: 8001
+  service-name: prime-service
 client:
   port: 8002

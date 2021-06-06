@@ -4,18 +4,19 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math"
 	"net"
 	"os"
 	"os/signal"
 
-	"github.com/samutayuga/samprobuf/calculator/primerpb"
-	"github.com/samutayuga/samprobuf/service/decomposer"
+	"github.com/samutayuga/samprobuf/pb"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 )
 
 var (
-	port int
+	port    int
+	svrType string
 )
 
 const (
@@ -23,36 +24,51 @@ const (
 	msgPrime    = "The number %d requested by %s is a prime"
 )
 
-type Calcserver struct {
-	primerpb.UnimplementedPrimerCalculatorServer
+func IsPrime(aNumber int) bool {
+	if aNumber == 2 {
+		return true
+	}
+	//if even
+	if aNumber > 2 && aNumber%2 == 0 {
+		return false
+	}
+	//if odd
+	for i := 3; float64(i) <= math.Sqrt(float64(aNumber)); i += 2 {
+		if aNumber%i == 0 {
+			return false
+		}
+	}
+	return true
 }
 
-func (s *Calcserver) Calculate(ctx context.Context, in *primerpb.CalculationRequest) (resp *primerpb.CalculationResponse, err error) {
+type Calcserver struct {
+	pb.UnimplementedPrimerCalculatorServer
+}
+
+func (s *Calcserver) Calculate(ctx context.Context, in *pb.CalculationRequest) (resp *pb.CalculationResponse, err error) {
 	log.Printf("serving one request from %s\n", in.Requestor)
 
-	if decomposer.IsPrime(int(in.Input)) {
+	if IsPrime(int(in.Input)) {
 		s := fmt.Sprintf(msgPrime, in.Input, in.Requestor)
-		r := &primerpb.CalculationResponse{Message: s, Count: in.Input}
+		r := &pb.CalculationResponse{Message: s}
 		return r, nil
-	}
-	if !decomposer.IsPrime(int(in.Input)) {
+	} else {
 		s := fmt.Sprintf(msgNotPrime, in.Input, in.Requestor)
-		r := &primerpb.CalculationResponse{Message: s, Count: in.Input}
+		r := &pb.CalculationResponse{Message: s}
 		return r, nil
 	}
-	return nil, nil
 }
 func main() {
 	log.Default().SetFlags(log.LstdFlags | log.Lshortfile)
 	log.Println("calculator server is started..")
-	svrStr := fmt.Sprintf("0.0.0.0:%d", port)
-	l, err := net.Listen("tcp", svrStr)
+	svrStr := fmt.Sprintf(":%d", port)
+	l, err := net.Listen(svrType, svrStr)
 	if err != nil {
 		log.Fatalf("error while creating listener %v", err)
 	}
 	//register the service
 	s := grpc.NewServer()
-	primerpb.RegisterPrimerCalculatorServer(s, &Calcserver{})
+	pb.RegisterPrimerCalculatorServer(s, &Calcserver{})
 	log.Println("Service is registered...")
 	go func() {
 		fmt.Println("Server starting ....")
@@ -81,6 +97,7 @@ func init() {
 	}
 
 	port = v.GetInt("server.port")
+	svrType = v.GetString("server.type")
 	log.Printf("get port number from config %d", port)
 
 }
