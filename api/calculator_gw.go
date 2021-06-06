@@ -74,6 +74,9 @@ func main() {
 		}
 
 	}).Methods("GET")
+	routes.HandleFunc("/liveness", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) }).Methods("GET")
+	routes.HandleFunc("/readiness", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) }).Methods("GET")
+
 	fmt.Printf("Calculator Gateway is running on %d\n", clientPort)
 	s := fmt.Sprintf(":%d", clientPort)
 	http.ListenAndServe(s, routes)

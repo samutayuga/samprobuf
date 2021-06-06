@@ -1,5 +1,5 @@
 server:
-  port: 8001
-  service-name: prime-calculator
+  port: 80
+  service-name: prime
 client:
   port: 8002
