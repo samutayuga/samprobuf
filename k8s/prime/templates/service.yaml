@@ -7,7 +7,9 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: prime
+    - name: prime
+      port: {{ .Values.service.port }}
+      protocol: TCP
+      targetPort: 8001
   selector:
     {{- include "prime.selectorLabels" . | nindent 4 }}
