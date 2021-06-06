@@ -1,9 +1,0 @@
-FROM golang
-RUN mkdir -p /go/src/github.com/samutayuga/samprobuf
-COPY ./pb /go/src/github.com/samutayuga/samprobuf
-COPY ./service /go/src/github.com/samutayuga/samprobuf
-WORKDIR /go/src/github.com/samutayuga/samprobuf
-RUN go get .
-WORKDIR /go/src/github.com/samutayuga/samprobuf/service
-ENTRYPOINT go run main.go
-EXPOSE 8001

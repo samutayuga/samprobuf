@@ -29,6 +29,7 @@ func main() {
 	log.Default().SetFlags(log.LstdFlags | log.Lshortfile)
 	opts := grpc.WithInsecure()
 	cs := fmt.Sprintf(connStr, serviceName, svrPort)
+	log.Printf("dialing server with connection %s", cs)
 	conn, err := grpc.Dial(cs, opts)
 	if err != nil {
 		log.Fatalf("error while dialing server 8001 %v", err)
@@ -73,7 +74,7 @@ func main() {
 		}
 
 	}).Methods("GET")
-	fmt.Printf("Client is running on %d\n", clientPort)
+	fmt.Printf("Calculator Gateway is running on %d\n", clientPort)
 	s := fmt.Sprintf(":%d", clientPort)
 	http.ListenAndServe(s, routes)
 
