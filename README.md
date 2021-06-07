@@ -3,25 +3,30 @@
 `service definition`
 
 The communication protocol used is `gRPC`.
-The foollowing is the defintion of service and messages in  `protcol buffer`.
+The following is the defintion of service and messages in  `protocol buffer`.
 
 ```proto
 // The calculator service defintion
 // a unary API
 // Synchronous API, request-response model
 
+syntax = "proto3";
+package pb;
+option go_package="calc/pb";
+// The calculator service defintion
+// a unary API
+// Synchronous API, request-response model
 service PrimerCalculator{
     rpc Calculate(CalculationRequest) returns (CalculationResponse){}
 }
 
 message CalculationRequest {
-    required string requestor=1;
-    required int32 input=2;
+string requestor=1;
+    int32 input=2;
 }
 
 message CalculationResponse {
-    required string message=1;
-    required int32 count=2;
+string message=1;
 }
 ```
 Compile them using a command as below,
@@ -102,11 +107,27 @@ docker build -t samutup/primer-gw:1.0.0 --no-cache -f DockerFile .
 ## Kubernetes Objects Defnition File
 
 ### Service
+`ConfigMaps`
+> To manage the configuration used by the `container` or `kubernetes` object
+
+`Deployment`
+
+`Pod`
 ```yaml
 
 ```
 
+`Service`
+> Exposing the service, in term of `hostname:port` to external. Can be outside or inside the cluster
+
+
+`ReplicaSet`
+
+`Ingress`
+
+
 ## Helm packaging
+> Package manager
 `helm chart`
 
 
