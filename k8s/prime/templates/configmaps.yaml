@@ -1,0 +1,7 @@
+#@formatter:off
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-config
+data:
+{{ tpl ((.Files.Glob "config/*").AsConfig) . | indent 2 }}

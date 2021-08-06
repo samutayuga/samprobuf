@@ -1,0 +1,12 @@
+application-name: {{ .Release.Name }}
+session-id: {{ .Values.sessionId }}
+assembly-type: {{ .Values.assemblyType }}
+{{- if .Values.used }}
+connectedToDs: true
+{{- end }}
+capabilities: {{ quote .Values.capabilities }}
+server:
+  port: 8001
+  service-name: 127.0.0.1
+client:
+  port: 8002

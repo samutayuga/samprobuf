@@ -1,5 +1,6 @@
+applicaton-name: {{ .Release.Name }}
 server:
-  port: 80
-  service-name: prime
+  port: 8001
+  service-name: 127.0.0.1
 client:
   port: 8002

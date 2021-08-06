@@ -4,21 +4,26 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
+	"text/template"
 	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/samutayuga/samprobuf/pb"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
+	"gopkg.in/yaml.v3"
 )
 
 var (
-	clientPort  int
-	svrPort     int
-	serviceName string
+	clientPort       int
+	svrPort          int
+	serviceName      string
+	assemblyTemplate *template.Template
 )
 
 const (
@@ -82,7 +87,28 @@ func main() {
 	http.ListenAndServe(s, routes)
 
 }
+
+type Assembly struct {
+	SessionId    string `yaml:"session-id"`
+	AssemblyType string `yaml:"assembly-type"`
+	Used         bool   `yaml:"connectedToDs"`
+	Capabilites  string `yaml:"capabilities"`
+}
+
+//InitTemplate ...
+func InitTemplate() {
+	var err error
+	assemblyTemplate, err = template.ParseGlob("*.gotmpl")
+	//remember to remove
+	if err != nil {
+		log.Printf("error while parsing the template %s %v", "*.gotmpl", err)
+		if assemblyTemplate, err = template.ParseFiles("assembly.gotmpl"); err != nil {
+			log.Fatalf("error while parsing the files %s %v", "*.gotmpl", err)
+		}
+	}
+}
 func init() {
+	InitTemplate()
 	v := viper.New()
 	v.AddConfigPath(".")
 	v.SetConfigFile("config/client.yaml")
@@ -91,11 +117,41 @@ func init() {
 		log.Fatalf("problem reading config %v", err)
 
 	}
+	appName := v.GetString("application-name")
+	connectedStatus := v.Get("connectedToDs")
 
+	if connectedStatus == nil {
+		log.Printf("connection status %v\n", false)
+	} else {
+		connectedStatus = v.GetBool("connectedToDs")
+		log.Printf("connection status %v\n", connectedStatus)
+	}
 	clientPort = v.GetInt("client.port")
 	serviceName = v.GetString("server.service-name")
 	svrPort = v.GetInt("server.port")
+	//read config
+	assembly := Assembly{}
+	assembly.getAssembly()
+	log.Printf("%s get port number from config %d", appName, clientPort)
 
-	log.Printf("get port number from config %d", clientPort)
+}
+func (a *Assembly) getAssembly() {
+	if yamlF, err := ioutil.ReadFile("config/client.yaml"); err == nil {
+		//unmarshal
+		if errUnmarshall := yaml.Unmarshal(yamlF, a); errUnmarshall != nil {
+			log.Fatalf("error unmarshalling config %v", errUnmarshall)
+		} else {
+			//display it
+			a.display()
+		}
+	} else {
+		log.Fatalf("error reading config %v", err)
+	}
 
+}
+func (a *Assembly) display() {
+	log.Printf("assembly %v\n", a)
+	if err := assemblyTemplate.ExecuteTemplate(os.Stdout, "assembly.gotmpl", a); err != nil {
+		log.Printf("error while executing template %s for data %v %v", "assembly.gotmpl", a, err)
+	}
 }

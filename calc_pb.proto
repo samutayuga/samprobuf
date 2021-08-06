@@ -9,10 +9,10 @@ service PrimerCalculator{
 }
 
 message CalculationRequest {
-string requestor=1;
-    int32 input=2;
+    string requestor=1;
 }
 
 message CalculationResponse {
-string message=1;
+    string message=1;
+    int32 nume=2;
 }

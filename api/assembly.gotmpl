@@ -1,0 +1,9 @@
+This is the assembly
+{{- with . }}
+================================================
+Session Id:                 {{ .SessionId }}
+Type:                       {{ .AssemblyType }}
+Connected to datasource :   {{ .Used }}
+Capabilites:                {{ .Capabilites }}
+================================================
+{{ end }}

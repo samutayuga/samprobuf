@@ -28,11 +28,11 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ .Release.Name }}-prime
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.images.prime.repository }}:{{ .Values.images.prime.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.images.prime.pullPolicy }}
           ports:
             - containerPort: 8001
           livenessProbe:
@@ -47,6 +47,32 @@ spec:
             periodSeconds: 20
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+        - name: {{ .Release.Name }}-prime-gw
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.images.primeGw.repository }}:{{ .Values.images.primeGw.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.images.primeGw.pullPolicy }}
+          ports:
+            - containerPort: 8002
+          livenessProbe:
+            tcpSocket:
+              port: 8002
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 8002
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: application-config
+              mountPath: /go/src/prime/config
+      volumes:
+        - name: application-config
+          configMap:
+            name: {{ .Release.Name }}-config
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
