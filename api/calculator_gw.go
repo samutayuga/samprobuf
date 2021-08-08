@@ -89,7 +89,7 @@ func main() {
 }
 
 type Capability struct {
-	CapabilityType string `yaml:"string"`
+	CapabilityType string `yaml:"capabilityType"`
 }
 type Assembly struct {
 	SessionId    string       `yaml:"session-id"`
