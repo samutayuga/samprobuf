@@ -88,11 +88,14 @@ func main() {
 
 }
 
+type Capability struct {
+	CapabilityType string `yaml:"string"`
+}
 type Assembly struct {
-	SessionId    string `yaml:"session-id"`
-	AssemblyType string `yaml:"assembly-type"`
-	Used         bool   `yaml:"connectedToDs"`
-	Capabilites  string `yaml:"capabilities"`
+	SessionId    string       `yaml:"session-id"`
+	AssemblyType string       `yaml:"assembly-type"`
+	Used         bool         `yaml:"connectedToDs"`
+	Capabilities []Capability `yaml:"capabilities"`
 }
 
 //InitTemplate ...

@@ -4,6 +4,11 @@ This is the assembly
 Session Id:                 {{ .SessionId }}
 Type:                       {{ .AssemblyType }}
 Connected to datasource :   {{ .Used }}
-Capabilites:                {{ .Capabilites }}
+Capabilites:                
+{{- with .Capabilites }}
+{{- range . }}
+{{ .CapabilityType }}
+{{- end }}
+{{- end }}
 ================================================
 {{ end }}
