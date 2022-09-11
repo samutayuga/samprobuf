@@ -6,7 +6,7 @@ Type:                       {{ .AssemblyType }}
 Connected to datasource :   {{ .Used }}
 Capabilities:                
 {{- with .Capabilities }}
-{{- range . -}}
+{{- range . }}
 {{ .CapabilityType }}
 {{ end -}}
 {{- end -}}

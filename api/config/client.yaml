@@ -1,6 +1,6 @@
 application-name: test
 server:
   port: 8001
-  service-name: calculator
+  service-name: 127.0.0.1
 client:
   port: 8002

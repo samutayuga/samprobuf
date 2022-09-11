@@ -1,0 +1,13 @@
+application-name: test
+session-id: e7e5c7c7-7bc3-4b41-8421-9a7a0f94ff7c
+assembly-type: ATM
+connectedToDs: false
+capabilities:
+  - capabilityType: FPL
+  - capabilityType: TRACK
+
+server:
+  port: 8001
+  service-name: calculator
+client:
+  port: 8002

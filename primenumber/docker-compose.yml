@@ -1,5 +1,5 @@
 ---
-version: '2'
+version: '3.7'
 services:
   calculator:
     image: samutup/calculator:1.0.0
@@ -11,8 +11,11 @@ services:
     image: samutup/calculator_gw:1.0.0
     hostname: calculator_gw
     container_name: calculator_gw
+    volumes:
+      - ./client-docker.yaml:/app/config/client.yaml:rw
     ports:
       - "8002:8002"
     depends_on:
       - calculator
+
 

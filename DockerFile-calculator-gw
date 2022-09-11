@@ -16,5 +16,6 @@ WORKDIR /app
 COPY --from=builder /calculator-gw ./calculator-gw
 COPY ./api/config ./config
 COPY ./api/assembly.gotmpl ./
+
 ENTRYPOINT ["/app/calculator-gw"]
 EXPOSE 8002
