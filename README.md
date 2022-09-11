@@ -70,39 +70,61 @@ This is an API to provide the calculation of prime number
 ### Service
 `Dockerfile`
 ```docker
-FROM golang
-COPY . /go/src/prime
-WORKDIR /go/src/prime
-RUN go mod init
-RUN go get ./...
-ENTRYPOINT go run main.go
+# syntax=docker/dockerfile:1
+FROM golang:1.18-buster AS builder
+WORKDIR /app
+COPY go.mod ./
+COPY go.sum ./
+
+RUN go mod download
+
+
+COPY ./service/main.go ./
+COPY ./pb ./pb
+RUN go build -o /calculator
+# Final Stage - Stage 2
+FROM gcr.io/distroless/base-debian10 as baseImage
+WORKDIR /app
+COPY --from=builder /calculator ./calculator
+COPY ./service/config ./config
+
+ENTRYPOINT ["/app/calculator"]
 EXPOSE 8001
 ```
 Building
 
 ```shell
-cd service
-
-docker build -t samutup/primer-checker:1.0.0 --no-cache -f DockerFile .
+docker build -t samutup/calculator:1.0.0 --no-cache -f DockerFile-calculator .
 ```
 
 ### Gateway
 `Dockerfile`
 ```docker
-FROM golang
-COPY . /go/src/prime
-WORKDIR /go/src/prime
-RUN go mod init
-RUN go get ./...
-ENTRYPOINT go run calculator_gw.go
+# syntax=docker/dockerfile:1
+FROM golang:1.18-buster AS builder
+WORKDIR /app
+COPY go.mod ./
+COPY go.sum ./
+
+RUN go mod download
+
+
+COPY ./api/calculator_gw.go ./
+COPY ./pb ./pb
+RUN go build -o /calculator-gw
+# Final Stage - Stage 2
+FROM gcr.io/distroless/base-debian10 as baseImage
+WORKDIR /app
+COPY --from=builder /calculator-gw ./calculator-gw
+COPY ./api/config ./config
+COPY ./api/assembly.gotmpl ./
+ENTRYPOINT ["/app/calculator-gw"]
 EXPOSE 8002
 ```
 Building
 
 ```shell
-cd api
-
-docker build -t samutup/primer-gw:1.0.0 --no-cache -f DockerFile .
+docker build -t samutup/calculator_gw:1.0.0 --no-cache -f DockerFile-calculator-gw .
 ```
 
 ## Kubernetes Objects Defnition File
