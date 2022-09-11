@@ -6,15 +6,15 @@ replicaCount: 1
 
 images:
   prime: 
-    repository: samutup/primer-checker
+    repository: samutup/calculator
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: "1.0.0"
   primeGw:
-    repository: samutup/primer-gw
+    repository: samutup/calculator_gw
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "2.0.7"
+    tag: "1.0.0"
 
 
 imagePullSecrets: []

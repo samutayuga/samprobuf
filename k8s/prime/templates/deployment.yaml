@@ -68,7 +68,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: application-config
-              mountPath: /go/src/prime/config
+              mountPath: /app/config
       volumes:
         - name: application-config
           configMap:
