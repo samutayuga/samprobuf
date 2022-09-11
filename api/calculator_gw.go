@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
-	"io/ioutil"
+	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net/http"
 	"os"
@@ -24,6 +25,7 @@ var (
 	svrPort          int
 	serviceName      string
 	assemblyTemplate *template.Template
+	configPath       string
 )
 
 const (
@@ -32,7 +34,7 @@ const (
 
 func main() {
 	log.Default().SetFlags(log.LstdFlags | log.Lshortfile)
-	opts := grpc.WithInsecure()
+	opts := grpc.WithTransportCredentials(insecure.NewCredentials())
 	cs := fmt.Sprintf(connStr, serviceName, svrPort)
 	log.Printf("dialing server with connection %s", cs)
 	conn, err := grpc.Dial(cs, opts)
@@ -98,7 +100,7 @@ type Assembly struct {
 	Capabilities []Capability `yaml:"capabilities"`
 }
 
-//InitTemplate ...
+// InitTemplate ...
 func InitTemplate() {
 	var err error
 	assemblyTemplate, err = template.ParseGlob("*.gotmpl")
@@ -111,10 +113,13 @@ func InitTemplate() {
 	}
 }
 func init() {
+
+	flag.StringVar(&configPath, "configPath", "config/client.yaml", "Provide the path of config file, eg. config/server.yaml")
+	flag.Parse()
 	InitTemplate()
 	v := viper.New()
 	v.AddConfigPath(".")
-	v.SetConfigFile("config/client.yaml")
+	v.SetConfigFile(configPath)
 	//v.SetConfigType("yaml")
 	if err := v.ReadInConfig(); err != nil {
 		log.Fatalf("problem reading config %v", err)
@@ -139,7 +144,7 @@ func init() {
 
 }
 func (a *Assembly) getAssembly() {
-	if yamlF, err := ioutil.ReadFile("config/client.yaml"); err == nil {
+	if yamlF, err := os.ReadFile(configPath); err == nil {
 		//unmarshal
 		if errUnmarshall := yaml.Unmarshal(yamlF, a); errUnmarshall != nil {
 			log.Fatalf("error unmarshalling config %v", errUnmarshall)

@@ -4,7 +4,7 @@ assembly-type: {{ .Values.assemblyType }}
 {{- if .Values.used }}
 connectedToDs: true
 {{- end }}
-capabilities: {{ quote .Values.capabilities }}
+capabilities: []
 server:
   port: 8001
   service-name: 127.0.0.1

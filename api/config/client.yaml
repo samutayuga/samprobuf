@@ -1,6 +1,6 @@
-applicaton-name: {{ .Release.Name }}
+application-name: test
 server:
   port: 8001
-  service-name: 127.0.0.1
+  service-name: calculator
 client:
   port: 8002

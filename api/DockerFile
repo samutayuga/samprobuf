@@ -1,7 +1,0 @@
-FROM golang
-COPY . /go/src/prime
-WORKDIR /go/src/prime
-RUN go mod init
-RUN go get ./...
-ENTRYPOINT go run calculator_gw.go
-EXPOSE 8002

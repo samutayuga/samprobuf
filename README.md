@@ -1,5 +1,6 @@
 # Micro services with go application
 > As a user I want to have a service which provide an API to calculate the maximum number of prime number for a given number
+
 `service definition`
 
 The communication protocol used is `gRPC`.

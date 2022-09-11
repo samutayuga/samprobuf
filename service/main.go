@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"math"
 	"net"
 	"os"
 	"os/signal"
+	"syscall"
 
 	"github.com/samutayuga/samprobuf/pb"
 	"github.com/spf13/viper"
@@ -35,6 +37,7 @@ func IsPrime(aNumber int) bool {
 	//if odd
 	for i := 3; float64(i) <= math.Sqrt(float64(aNumber)); i += 2 {
 		if aNumber%i == 0 {
+			log.Printf("Found at least one divider other than %d which is %d", aNumber, aNumber/i)
 			return false
 		}
 	}
@@ -59,6 +62,7 @@ func (s *Calcserver) Calculate(ctx context.Context, in *pb.CalculationRequest) (
 	}
 }
 func main() {
+
 	log.Default().SetFlags(log.LstdFlags | log.Lshortfile)
 	log.Println("calculator server is started..")
 	svrStr := fmt.Sprintf(":%d", port)
@@ -79,7 +83,7 @@ func main() {
 	}()
 
 	ch := make(chan os.Signal, 1)
-	signal.Notify(ch, os.Interrupt)
+	signal.Notify(ch, syscall.SIGKILL)
 	<-ch
 	fmt.Println("Stopping the server...")
 	s.Stop()
@@ -87,9 +91,12 @@ func main() {
 	l.Close()
 }
 func init() {
+	var serverConfigPath string
+	flag.StringVar(&serverConfigPath, "serverConfig", "config/server.yaml", "Provide the path of config file, eg. config/server.yaml")
+	flag.Parse()
 	v := viper.New()
 	v.AddConfigPath(".")
-	v.SetConfigFile("config/server.yaml")
+	v.SetConfigFile(serverConfigPath)
 	//v.SetConfigType("yaml")
 	if err := v.ReadInConfig(); err != nil {
 		log.Fatalf("problem reading config %v", err)

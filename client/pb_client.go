@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
+	"google.golang.org/grpc/credentials/insecure"
 	"log"
 
 	"github.com/samutayuga/samprobuf/pb"
@@ -21,9 +23,12 @@ const (
 )
 
 func init() {
+	var configPath string
+	flag.StringVar(&configPath, "configPath", "config/client.yaml", "Provide the path of config file, eg. config/server.yaml")
+	flag.Parse()
 	v := viper.New()
 	v.AddConfigPath(".")
-	v.SetConfigFile("config/client.yaml")
+	v.SetConfigFile(configPath)
 	//v.SetConfigType("yaml")
 	if err := v.ReadInConfig(); err != nil {
 		log.Fatalf("problem reading config %v", err)
@@ -39,7 +44,7 @@ func init() {
 }
 func main() {
 	log.Default().SetFlags(log.LstdFlags | log.Lshortfile)
-	opts := grpc.WithInsecure()
+	opts := grpc.WithTransportCredentials(insecure.NewCredentials())
 	cs := fmt.Sprintf(connStr, serviceName, svrPort)
 	conn, err := grpc.Dial(cs, opts)
 	if err != nil {
